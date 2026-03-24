@@ -1,0 +1,14 @@
+{
+  "name": "cre-enterprise-suite",
+  "version": "1.0.0",
+  "description": "Professional Commercial Real Estate Analysis Platform",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"cd backend && py -m uvicorn main:app --reload --port 8000\" \"cd frontend && npm run dev\"",
+    "build": "cd frontend && npm run build",
+    "preview": "cd frontend && npm run preview"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "expo": {
+    "name": "CRE Enterprise",
+    "slug": "cre-enterprise-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0F1419"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.cre.enterprise"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0F1419"
+      },
+      "package": "com.cre.enterprise"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}
