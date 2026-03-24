@@ -1,11 +1,8 @@
-# CRE Enterprise Suite - Docker Compose
-version: '3.8'
-
 services:
   backend:
     build:
       context: ./backend
-      dockerfile: ../Dockerfile
+      dockerfile: Dockerfile
     container_name: cre-backend
     ports:
       - "8000:8000"
@@ -28,14 +25,3 @@ services:
     environment:
       - NODE_ENV=development
     restart: unless-stopped
-
-  # Optional: Add nginx reverse proxy in production
-  # nginx:
-  #   image: nginx:alpine
-  #   ports:
-  #     - "80:80"
-  #   volumes:
-  #     - ./nginx.conf:/etc/nginx/nginx.conf
-  #   depends_on:
-  #     - backend
-  #     - frontend
