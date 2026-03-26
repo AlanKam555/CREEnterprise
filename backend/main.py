@@ -194,7 +194,8 @@ class UserCreate(BaseModel):
     role: str = "analyst"
 
 class UserLogin(BaseModel):
-    username: str
+    username: Optional[str] = None
+    email: Optional[str] = None
     password: str
 
 class TokenResponse(BaseModel):
@@ -288,11 +289,18 @@ async def register(user: UserCreate):
 @app.post("/api/auth/login", response_model=TokenResponse)
 async def login(credentials: UserLogin):
     db = get_db()
-    user = db.execute("SELECT * FROM users WHERE username = ?", (credentials.username,)).fetchone()
+    
+    # Support login with either username or email
+    identifier = credentials.username or credentials.email
+    if not identifier:
+        raise HTTPException(status_code=400, detail="Username or email required")
+    
+    user = db.execute("SELECT * FROM users WHERE username = ? OR email = ?", 
+                      (identifier, identifier)).fetchone()
     db.close()
     
     if not user or not verify_password(credentials.password, user["hashed_password"]):
-        raise HTTPException(status_code=401, detail="Invalid username or password")
+        raise HTTPException(status_code=401, detail="Invalid username/email or password")
     
     token = create_access_token({"sub": user["id"]})
     return TokenResponse(

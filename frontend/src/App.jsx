@@ -550,22 +550,69 @@ function Memos() {
 
 // ============ AUTH PAGES ============
 function LoginPage({ onLogin }) {
-  const [form, setForm] = useState({ email: '', password: '' })
+  const [isSignUp, setIsSignUp] = useState(false)
+  const [form, setForm] = useState({ email: '', username: '', password: '' })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
 
   const handleLogin = async () => {
-    if (!form.email || !form.password) return
+    if (!form.email || !form.password) {
+      setError('Please fill in all fields')
+      return
+    }
     setLoading(true)
+    setError('')
     try {
-      const res = await API.post('/auth/login', form)
+      const res = await API.post('/auth/login', { email: form.email, password: form.password })
       localStorage.setItem('token', res.data.access_token)
-      localStorage.setItem('user_id', res.data.user_id)
-      onLogin(res.data.user_id)
+      localStorage.setItem('user_id', res.data.user.id)
+      onLogin(res.data.user.id)
     } catch (e) {
-      setError('Invalid credentials')
+      setError('Invalid credentials. Please try again.')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleSignUp = async () => {
+    if (!form.email || !form.username || !form.password) {
+      setError('Please fill in all fields')
+      return
+    }
+    if (form.password.length < 6) {
+      setError('Password must be at least 6 characters')
+      return
+    }
+    setLoading(true)
+    setError('')
+    setSuccess('')
+    try {
+      const res = await API.post('/auth/register', {
+        email: form.email,
+        username: form.username,
+        password: form.password
+      })
+      setSuccess('Account created! You can now login.')
+      setIsSignUp(false)
+      setForm({ ...form, password: '' })
+    } catch (e) {
+      if (e.response?.data?.detail) {
+        setError(e.response.data.detail)
+      } else {
+        setError('Registration failed. Email may already be in use.')
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleSubmit = (e) => {
+    e?.preventDefault()
+    if (isSignUp) {
+      handleSignUp()
+    } else {
+      handleLogin()
     }
   }
 
@@ -580,17 +627,59 @@ function LoginPage({ onLogin }) {
           <p className="text-gray-400 text-sm mt-1">Enterprise Edition</p>
         </div>
 
-        <div className="space-y-4">
-          <input type="email" placeholder="Email" value={form.email} onChange={e => setForm({...form, email: e.target.value})} />
-          <input type="password" placeholder="Password" value={form.password} onChange={e => setForm({...form, password: e.target.value})} />
-          {error && <p className="text-cre-red text-xs">{error}</p>}
-          <button onClick={handleLogin} disabled={loading} className="cre-btn-primary w-full">
-            {loading ? 'Logging in...' : 'Login'}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input 
+            type="email" 
+            placeholder="Email" 
+            value={form.email} 
+            onChange={e => setForm({...form, email: e.target.value})}
+            required
+          />
+          
+          {isSignUp && (
+            <input 
+              type="text" 
+              placeholder="Username" 
+              value={form.username} 
+              onChange={e => setForm({...form, username: e.target.value})}
+              required
+            />
+          )}
+          
+          <input 
+            type="password" 
+            placeholder="Password" 
+            value={form.password} 
+            onChange={e => setForm({...form, password: e.target.value})}
+            required
+          />
+          
+          {error && <p className="text-red-400 text-xs">{error}</p>}
+          {success && <p className="text-green-400 text-xs">{success}</p>}
+          
+          <button 
+            type="submit"
+            disabled={loading} 
+            className="cre-btn-primary w-full"
+          >
+            {loading ? (isSignUp ? 'Creating Account...' : 'Logging in...') : (isSignUp ? 'Sign Up' : 'Login')}
           </button>
-        </div>
+        </form>
 
         <div className="mt-6 pt-6 border-t border-cre-border text-center">
-          <p className="text-gray-400 text-sm">Don't have an account? <button onClick={() => {}} className="text-cre-blue hover:underline">Sign up</button></p>
+          <p className="text-gray-400 text-sm">
+            {isSignUp ? "Already have an account? " : "Don't have an account? "}
+            <button 
+              onClick={() => {
+                setIsSignUp(!isSignUp)
+                setError('')
+                setSuccess('')
+              }} 
+              className="text-cre-blue hover:underline"
+            >
+              {isSignUp ? 'Login' : 'Sign up'}
+            </button>
+          </p>
         </div>
       </div>
     </div>
