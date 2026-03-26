@@ -2,9 +2,16 @@
 REM CRE Enterprise - Quick Start Script for Windows
 REM This script starts both backend and frontend servers
 
+REM ========================================
+REM IMPORTANT: Change to the project directory first!
+REM ========================================
+cd /d "C:\Users\alank\.qclaw\workspace\CREEnterprise"
+
 echo ==========================================
 echo   CRE Enterprise Suite - Quick Start
 echo ==========================================
+echo.
+echo Current directory: %CD%
 echo.
 
 REM Check if Python is installed
@@ -28,11 +35,27 @@ if errorlevel 1 (
 echo [OK] Python and Node.js are installed
 echo.
 
+REM Check if directories exist
+if not exist "C:\Users\alank\.qclaw\workspace\CREEnterprise\backend" (
+    echo [ERROR] Backend directory not found!
+    echo Expected: C:\Users\alank\.qclaw\workspace\CREEnterprise\backend
+    pause
+    exit /b 1
+)
+
+if not exist "C:\Users\alank\.qclaw\workspace\CREEnterprise\frontend" (
+    echo [ERROR] Frontend directory not found!
+    echo Expected: C:\Users\alank\.qclaw\workspace\CREEnterprise\frontend
+    pause
+    exit /b 1
+)
+
+echo [OK] Project directories found
+echo.
+
 REM Start Backend
 echo [1/2] Starting Backend Server...
-cd backend
-start "CRE Backend" cmd /k "python -m uvicorn main:app --reload --port 8000"
-cd ..
+start "CRE Backend" cmd /k "cd /d C:\Users\alank\.qclaw\workspace\CREEnterprise\backend && python -m uvicorn main:app --reload --port 8000"
 echo       Backend running at: http://localhost:8000
 echo       API Documentation: http://localhost:8000/docs
 echo.
@@ -42,9 +65,7 @@ timeout /t 3 /nobreak >nul
 
 REM Start Frontend
 echo [2/2] Starting Frontend Server...
-cd frontend
-start "CRE Frontend" cmd /k "npm run dev"
-cd ..
+start "CRE Frontend" cmd /k "cd /d C:\Users\alank\.qclaw\workspace\CREEnterprise\frontend && npm run dev"
 echo       Frontend running at: http://localhost:5173
 echo.
 
